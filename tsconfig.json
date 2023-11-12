@@ -1,0 +1,17 @@
+{
+	"include": ["src/**/*"],
+	"compilerOptions": {
+		"outDir": "./lib",
+		"skipLibCheck": true,
+		"moduleResolution": "node",
+		"module": "es2022",
+		"target": "es2022",
+		"strict": true,
+		"sourceMap": true,
+		"esModuleInterop": true,
+		"noImplicitAny": false,
+		"forceConsistentCasingInFileNames": true,
+		"useUnknownInCatchVariables": true,
+	},
+	 "$schema": "https://json.schemastore.org/tsconfig",
+}

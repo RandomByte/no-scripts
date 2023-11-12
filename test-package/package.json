@@ -1,0 +1,19 @@
+{
+	"name": "no-scripts-test-package",
+	"version": "0.0.1",
+	"description": "Demonstration and evaluation package for unwanted operations in npm lifecycle scripts",
+	"type": "module",
+	"scripts": {
+		"preinstall": "echo 'preinstall script'",
+		"install": "echo 'install script'",
+		"postinstall": "echo 'postinstall script' && node cleanScripts.js",
+		"prepublish": "echo 'prepublish script'",
+		"preprepare": "echo 'preprepare script'",
+		"prepare": "echo 'prepare script'",
+		"postprepare": "echo 'postprepare script'",
+		"test": "node cleanScripts.js"
+	},
+	"keywords": [],
+	"author": "Merlin Beutlberger",
+	"license": "MIT"
+}
