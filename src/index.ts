@@ -15,16 +15,23 @@ export interface PackageInfo {
 
 export type PackageInfoMap = Map<ModulePath, PackageInfo>;
 
+export interface PackageAnalysisRequest {
+	cwd: string,
+	ignorePackages: string[]
+}
+
 /*
  * Downloads all tarballs specified in the lockfile
  */
-export async function lockfile({cwd}) {
+export async function analyzeLockfile({cwd, ignorePackages}: PackageAnalysisRequest) {
 	const rootPackageInfo = await getRootPackage(cwd);
 
 	let lockfile = await tryReadJson(path.join(rootPackageInfo.modulePath, `package-lock.json`));
+	let packageLock = true;
 	if (!lockfile) {
 		// If no package-lock.json is available, try npm-shrinkwrap.json
 		lockfile = await tryReadJson(path.join(rootPackageInfo.modulePath, `npm-shrinkwrap.json`));
+		packageLock = false;
 	}
 	if (!lockfile) {
 		throw new Error(
@@ -32,17 +39,19 @@ export async function lockfile({cwd}) {
 			`However, neither a package-lock.json nor an npm-shrinkwrap.json ` +
 			`file could be found at ${rootPackageInfo.modulePath}.`);
 	}
-	console.log(`Analyzing using lockfile and remote registry`);
+	console.log(`Analyzing using ${packageLock ? "package-lock.json" : "npm-shrinkwrap.json"} and registry`);
 	const packages = await getPackagesFromLockfile(rootPackageInfo, lockfile);
+	removeIgnoredPackages(packages, ignorePackages);
 	return await analyzePackages(packages);
 }
 
-export async function packageJson({cwd}) {
-	console.log(`Analyzing using locally installed dependencies`);
+export async function analyzePackageJson({cwd, ignorePackages}: PackageAnalysisRequest) {
+	console.log(`Analyzing using package.json and locally installed dependencies`);
 	const rootPackageInfo = await getRootPackage(cwd);
 
-	const depPackages = await getPackagesFromInstalledDependencies(rootPackageInfo);
-	return await analyzePackages(depPackages);
+	const packages = await getPackagesFromInstalledDependencies(rootPackageInfo);
+	removeIgnoredPackages(packages, ignorePackages);
+	return await analyzePackages(packages);
 }
 
 async function getRootPackage(cwd) : Promise<PackageInfo>{
@@ -73,4 +82,22 @@ async function tryReadJson(jsonPath) {
 			throw err;
 		}
 	}
+}
+
+function removeIgnoredPackages(packages: PackageInfoMap, ignorePackages: string[]) {
+	const foundIgnoredPackages = new Set<string>();
+	if (ignorePackages && ignorePackages.length) {
+		for (const [modulePath, packageInfo] of packages.entries()) {
+			if (ignorePackages.includes(packageInfo.packageJson.name)) {
+				packages.delete(modulePath);
+				foundIgnoredPackages.add(packageInfo.packageJson.name);
+			}
+		}
+		ignorePackages.forEach((ignoredPackageName) => {
+			if (!foundIgnoredPackages.has(ignoredPackageName)) {
+				throw new Error(`Failed to find ignored package: ${ignoredPackageName}`);
+			}
+		});
+	}
+	console.log(`(ignoring ${foundIgnoredPackages.size} packages)`);
 }

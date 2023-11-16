@@ -89,7 +89,7 @@ async function exists(filePath) {
 }
 
 export async function getPackagesFromLockfile(
-	packageInfo: PackageInfo, lockfile: Lockfile
+	packageInfo: PackageInfo, lockfile: Lockfile,
 ): Promise<PackageInfoMap> {
 	if (![2, 3].includes(lockfile.lockfileVersion)) {
 		throw new Error(
@@ -113,12 +113,14 @@ export async function getPackagesFromLockfile(
 			// Ignore root package
 			return;
 		}
+		if (packageDescriptor.link) {
+			// Ignore links
+			return;
+		}
 		if (!packageDescriptor.resolved) {
 			// Packages from other sources than an npm registry (i.e. local)
-			console.log(packageDescriptor);
-			throw new Error(`Failed to resolve lockfile entry for package: ${packageLocation}`);
+			return;
 		}
-
 
 		if (requests.has(packageDescriptor.resolved)) {
 			// Already pending

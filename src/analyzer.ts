@@ -5,6 +5,7 @@ export interface PackageAnalysisResults {
 	numberOfFindings: number
 }
 export interface PackageAnalysisResult {
+	packageName: string,
 	packageInfo: PackageInfo
 	messages: string[]
 }
@@ -30,6 +31,7 @@ export async function analyzePackages(packages: PackageInfoMap): Promise<Package
 export async function analyzePackage(packageInfo: PackageInfo): Promise<PackageAnalysisResult> {
 	const messages = checkInstallScripts(packageInfo);
 	return {
+		packageName: packageInfo.packageJson.name,
 		packageInfo,
 		messages
 	};
