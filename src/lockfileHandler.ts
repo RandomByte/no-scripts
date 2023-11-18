@@ -60,7 +60,7 @@ export interface Lockfile {
 	packages: Map<PackageLocation, PackageDescriptor>
 }
 
-async function retrieveTarball(url, targetPath, cacheDir, expectedIntegrity) {
+async function retrieveTarball(url: string, targetPath: string, cacheDir: string, expectedIntegrity: string) {
 	await mkdirp(targetPath);
 	await pacote.extract(url, targetPath, {
 		integrity: expectedIntegrity,
@@ -69,11 +69,11 @@ async function retrieveTarball(url, targetPath, cacheDir, expectedIntegrity) {
 	});
 }
 
-async function mkdirp(dirPath) {
+async function mkdirp(dirPath: string) {
 	return mkdir(dirPath, {recursive: true});
 }
 
-async function exists(filePath) {
+async function exists(filePath: string) {
 	try {
 		await stat(filePath);
 		return true;

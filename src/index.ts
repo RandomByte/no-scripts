@@ -54,7 +54,7 @@ export async function analyzePackageJson({cwd, ignorePackages}: PackageAnalysisR
 	return await analyzePackages(packages);
 }
 
-async function getRootPackage(cwd) : Promise<PackageInfo>{
+async function getRootPackage(cwd: string) : Promise<PackageInfo>{
 	const root = await readPackageUp({
 		cwd,
 		normalize: true
@@ -68,7 +68,7 @@ async function getRootPackage(cwd) : Promise<PackageInfo>{
 	};
 }
 
-async function tryReadJson(jsonPath) {
+async function tryReadJson(jsonPath: string) {
 	try {
 		const content = await readFile(jsonPath, {encoding: "utf8"});
 		return JSON.parse(content);

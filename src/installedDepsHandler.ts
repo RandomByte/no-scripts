@@ -2,9 +2,11 @@ import {promisify} from "node:util";
 import path from "node:path";
 import {realpath} from "node:fs/promises";
 import resolve from "resolve";
-const resolveModulePath = promisify(resolve);
+const resolveModulePath = promisify(resolve) as unknown as typeof PromisifiedResolve;
 import {ModulePath, PackageInfo, PackageInfoMap, PackageManifest} from "./index.js";
 import {readPackageJson} from "./util.js";
+
+declare function PromisifiedResolve(id: string, opts: resolve.AsyncOpts): Promise<string>;
 
 interface Dependency {
 	packageName: string,
@@ -42,7 +44,7 @@ function getPackageDependencies(pkg: PackageManifest, rootPkg = false): Dependen
 
 async function getPackageJson(moduleName: string, parentDir: string): Promise<PackageInfo> {
 	try {
-		let packageJsonPath: string = await resolveModulePath(moduleName + "/package.json", {
+		let packageJsonPath = await resolveModulePath(moduleName + "/package.json", {
 			basedir: parentDir,
 			preserveSymlinks: false
 		});

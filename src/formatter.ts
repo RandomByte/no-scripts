@@ -1,33 +1,19 @@
 import {PackageAnalysisResults} from "./analyzer.js";
 
-export function writeToConsole(
-	lockfileResults: PackageAnalysisResults,
-	packageJsonResults: PackageAnalysisResults | undefined
+export function writeResultsToConsole(
+	results: PackageAnalysisResults
 ) {
-	for (const packageResult of lockfileResults.packages) {
-		if (packageResult.messages.length) {
-			console.log(`Findings for package ${packageResult.packageInfo.packageJson.name}:`);
-			for (const msg of packageResult.messages) {
-				console.log(`  ${msg}`);
-			}
-			console.log("");
-		}
-	}
-	console.log(`${lockfileResults.numberOfFindings} Findings`);
-
-	if (packageJsonResults) {
+	if (results) {
 		console.log("");
-		console.log("------------------------");
-		console.log("Local results:");
-		for (const packageResult of packageJsonResults.packages) {
+		for (const packageResult of results.packages) {
 			if (packageResult.messages.length) {
-				console.log(`Findings for package ${packageResult.packageInfo.packageJson.name}:`);
+				console.log(`# Findings for package ${packageResult.packageInfo.packageJson.name}:`);
 				for (const msg of packageResult.messages) {
-					console.log(`  ${msg}`);
+					console.log(`  * ${msg}`);
 				}
 				console.log("");
 			}
 		}
-		console.log(`${packageJsonResults.numberOfFindings} Findings`);
+		console.log(`Findings: ${results.numberOfFindings}`);
 	}
 }
