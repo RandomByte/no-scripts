@@ -3,6 +3,7 @@ import {tmpdir} from "node:os";
 import {mkdir, stat} from "node:fs/promises";
 import pacote from "pacote";
 import {rimraf} from "rimraf";
+import pThrottle from "p-throttle";
 import {PackageInfo, PackageInfoMap, PackageManifest} from "./index.js";
 import {readPackageJson} from "./util.js";
 
@@ -93,7 +94,7 @@ export async function getPackagesFromLockfile(
 ): Promise<PackageInfoMap> {
 	if (![2, 3].includes(lockfile.lockfileVersion)) {
 		throw new Error(
-			`This tool requires lockfile version '2' or '3'. ` +
+			`no-scripts requires lockfile version '2' or '3'. ` +
 			`For details, see https://docs.npmjs.com/cli/configuring-npm/package-lock-json#lockfileversion`);
 	}
 	const workDir = path.join(tmpdir(), "no-scripts", `test-${packageInfo.packageJson.name}`);
@@ -133,8 +134,14 @@ export async function getPackagesFromLockfile(
 	});
 
 	console.log(`Fetching ${requests.size} tarballs...`);
+	// Slightly throttle the number of concurrent requests to 100 requests per 100 ms to hopefully prevent errors like:
+	// "Client network socket disconnected before secure TLS connection was established"
+	const throttle = pThrottle({
+		limit: 100,
+		interval: 100
+	});
 	await Promise.all(Array.from(requests.entries())
-		.map(async ([url, {integrity, packageLocation}]) => {
+		.map(throttle(async ([url, {integrity, packageLocation}]) => {
 			const targetRelPath = packageLocation.replace("node_modules/", "");
 			const targetPath = path.join(packagesDir, targetRelPath);
 			await retrieveTarball(url, targetPath, cacheDir, integrity);
@@ -144,7 +151,7 @@ export async function getPackagesFromLockfile(
 				packageJson,
 				modulePath
 			});
-		}));
+		})));
 	await rimraf(workDir);
 	return packages;
 }
