@@ -20,7 +20,8 @@ await yargs(hideBin(process.argv))
 	.scriptName("no-scripts")
 	.command<NoScriptsArg>(
 		"$0 [projectDir]",
-		"Checks all npm dependencies and fail if any of them define automatically executed npm lifecycle scripts",
+		"Check all installed npm dependencies of the current project and fail if any of them " +
+			"define automatically executed npm lifecycle scripts",
 		(yargs) => {
 			yargs
 				.positional("projectDir", {
@@ -29,15 +30,19 @@ await yargs(hideBin(process.argv))
 				});
 		},
 		async (argv) => {
+			if (argv.includeLocal && !argv.online) {
+				console.log(`Parameter '--include-local' must only be used with '--online'`);
+				process.exit(1);
+			}
 			const cwd = argv.projectDir? path.resolve(argv.projectDir) : process.cwd();
 			let lockfileResults: PackageAnalysisResults | undefined;
-			if (!argv.offline) {
+			if (argv.online) {
 				lockfileResults = await analyzeLockfile({cwd, ignorePackages: argv.ignore || []});
 				writeResultsToConsole(lockfileResults);
 				console.log("");
 			}
 			let packageJsonResult: PackageAnalysisResults | undefined;
-			if (argv.includeLocal || argv.offline) {
+			if (!argv.online || argv.includeLocal) {
 				packageJsonResult = await analyzePackageJson({cwd, ignorePackages: argv.ignore || []});
 				writeResultsToConsole(packageJsonResult);
 				console.log("");
@@ -97,11 +102,12 @@ await yargs(hideBin(process.argv))
 		string: true,
 	})
 	.option("include-local", {
-		describe: "Extend check to include local dependencies",
+		describe: "Only relevant when using `--online`. Extend check to include local dependencies",
 		boolean: true,
 	})
-	.option("offline", {
-		describe: "Only scan local dependencies. Implies '--include-local'",
+	.option("online", {
+		describe: "Instead of analyzing local dependencies, " +
+			"fetch all dependencies independently from the registry as an extra level of safety",
 		boolean: true,
 	})
 	.option("verbose", {

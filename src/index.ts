@@ -2,6 +2,7 @@ import path from "node:path";
 import {readFile} from "node:fs/promises";
 import {NormalizedPackageJson, readPackageUp} from "read-package-up";
 import {getPackagesFromInstalledDependencies} from "./installedDepsHandler.js";
+import mapWorkspaces from "@npmcli/map-workspaces";
 import {getPackagesFromLockfile} from "./lockfileHandler.js";
 import {analyzePackages} from "./analyzer.js";
 
@@ -48,8 +49,29 @@ export async function analyzeLockfile({cwd, ignorePackages}: PackageAnalysisRequ
 export async function analyzePackageJson({cwd, ignorePackages}: PackageAnalysisRequest) {
 	console.log(`Analyzing using package.json and locally installed dependencies`);
 	const rootPackageInfo = await getRootPackage(cwd);
-
 	const packages = await getPackagesFromInstalledDependencies(rootPackageInfo);
+
+	// Check for workspace config
+	if (rootPackageInfo.packageJson.workspaces) {
+		const workspacePaths = await mapWorkspaces({
+			cwd,
+			pkg: rootPackageInfo.packageJson
+		});
+		if (workspacePaths.size) {
+			// Read packages in workspaces concurrently
+			const paths = Array.from(workspacePaths.values());
+			await Promise.all(paths.map(async (workspacePath: string) => {
+				const workspacePackageInfo = await getRootPackage(workspacePath);
+				const workspacePackages = await getPackagesFromInstalledDependencies(workspacePackageInfo);
+				workspacePackages.forEach((pkgInfo, modulePath) => {
+					if (!packages.has(modulePath)) {
+						packages.set(modulePath, pkgInfo);
+					}
+				});
+			}));
+		}
+	}
+
 	removeIgnoredPackages(packages, ignorePackages);
 	return await analyzePackages(packages);
 }
