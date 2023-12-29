@@ -40,15 +40,17 @@ export async function analyzeLockfile({cwd, ignorePackages}: PackageAnalysisRequ
 			`However, neither a package-lock.json nor an npm-shrinkwrap.json ` +
 			`file could be found at ${rootPackageInfo.modulePath}.`);
 	}
-	console.log(`Analyzing using ${packageLock ? "package-lock.json" : "npm-shrinkwrap.json"} and registry`);
+	console.log(`Analyzing ${packageLock ? "package-lock.json" : "npm-shrinkwrap.json"} ` +
+		`of package "${rootPackageInfo.packageJson.name}" and fetching packages from the registry...`);
 	const packages = await getPackagesFromLockfile(rootPackageInfo, lockfile);
 	removeIgnoredPackages(packages, ignorePackages);
 	return await analyzePackages(packages);
 }
 
 export async function analyzePackageJson({cwd, ignorePackages}: PackageAnalysisRequest) {
-	console.log(`Analyzing using package.json and locally installed dependencies`);
 	const rootPackageInfo = await getRootPackage(cwd);
+	console.log(`Analyzing package.json of package "${rootPackageInfo.packageJson.name}" ` +
+		`and locally installed dependencies...`);
 	const packages = await getPackagesFromInstalledDependencies(rootPackageInfo);
 
 	// Check for workspace config
