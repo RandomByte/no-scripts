@@ -877,20 +877,28 @@
 			}
 		},
 		"node_modules/@npmcli/package-json": {
-			"version": "5.0.0",
-			"resolved": "https://registry.npmjs.org/@npmcli/package-json/-/package-json-5.0.0.tgz",
-			"integrity": "sha512-OI2zdYBLhQ7kpNPaJxiflofYIpkNLi+lnGdzqUOfRmCF3r2l1nadcjtCYMJKv/Utm/ZtlffaUuTiAktPHbc17g==",
+			"version": "5.2.0",
+			"resolved": "https://registry.npmjs.org/@npmcli/package-json/-/package-json-5.2.0.tgz",
+			"integrity": "sha512-qe/kiqqkW0AGtvBjL8TJKZk/eBBSpnJkUWvHdQ9jM2lKHXRYYJuyNpJPlJw3c8QjC2ow6NZYiLExhUaeJelbxQ==",
 			"dependencies": {
 				"@npmcli/git": "^5.0.0",
 				"glob": "^10.2.2",
 				"hosted-git-info": "^7.0.0",
 				"json-parse-even-better-errors": "^3.0.0",
 				"normalize-package-data": "^6.0.0",
-				"proc-log": "^3.0.0",
+				"proc-log": "^4.0.0",
 				"semver": "^7.5.3"
 			},
 			"engines": {
 				"node": "^16.14.0 || >=18.0.0"
+			}
+		},
+		"node_modules/@npmcli/package-json/node_modules/proc-log": {
+			"version": "4.2.0",
+			"resolved": "https://registry.npmjs.org/proc-log/-/proc-log-4.2.0.tgz",
+			"integrity": "sha512-g8+OnU/L2v+wyiVK+D5fA34J7EH8jZ8DDlvwhRCMxmMj7UCBvxiO1mGeN+36JXIKF4zevU4kRBd8lVgG9vLelA==",
+			"engines": {
+				"node": "^14.17.0 || ^16.13.0 || >=18.0.0"
 			}
 		},
 		"node_modules/@npmcli/promise-spawn": {
