@@ -26,7 +26,7 @@
 		"npm-shrinkwrap.json"
 	],
 	"dependencies": {
-		"@npmcli/map-workspaces": "^3.0.4",
+		"@npmcli/map-workspaces": "^4.0.2",
 		"@npmcli/package-json": "^5.0.0",
 		"p-throttle": "^6.1.0",
 		"pacote": "^19.0.0",
