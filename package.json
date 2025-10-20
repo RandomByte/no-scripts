@@ -36,7 +36,7 @@
 		"yargs": "^18.0.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20.8.10",
+		"@types/node": "^24.9.0",
 		"@types/npmcli__map-workspaces": "^3.0.4",
 		"@types/pacote": "^11.1.8",
 		"@types/resolve": "^1.20.5",
