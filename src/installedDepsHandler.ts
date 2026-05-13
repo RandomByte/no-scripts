@@ -2,11 +2,11 @@ import {promisify} from "node:util";
 import path from "node:path";
 import {realpath} from "node:fs/promises";
 import resolve from "resolve";
-const resolveModulePath = promisify(resolve) as unknown as typeof PromisifiedResolve;
+
+type PromisifiedResolve = (id: string, opts: resolve.AsyncOpts) => Promise<string>;
+const resolveModulePath = promisify(resolve) as unknown as PromisifiedResolve;
 import {ModulePath, PackageInfo, PackageInfoMap, PackageManifest} from "./index.js";
 import {readPackageJson} from "./util.js";
-
-declare function PromisifiedResolve(id: string, opts: resolve.AsyncOpts): Promise<string>;
 
 interface Dependency {
 	packageName: string,

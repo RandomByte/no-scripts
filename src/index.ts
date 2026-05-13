@@ -7,7 +7,7 @@ import {getPackagesFromLockfile} from "./lockfileHandler.js";
 import {analyzePackages} from "./analyzer.js";
 
 export type ModulePath = string;
-export interface PackageManifest extends NormalizedPackageJson {}
+export type PackageManifest = NormalizedPackageJson;
 
 export interface PackageInfo {
 	packageJson: NormalizedPackageJson,
